@@ -20,5 +20,3 @@ g++ ./*.o -o Tun2Socks
 # 运行，注意运行前一定要先启动socks5代理，并且关闭时一定要用Ctrl+C停止进程，因为处理了此信号，用于恢复路由表，参考socksify_darwin.cpp: void signal_handler(int sig)
 sudo ./Tun2Socks
 ```
-
-g++ -c src/*.o
