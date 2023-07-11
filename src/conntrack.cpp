@@ -1075,7 +1075,7 @@ ssize_t tcp_frag_nat(void *packet, size_t len, size_t limit)
 	return len;
 }
 
-void module_init(void)
+void module_init(uint16_t port)
 {
 #ifdef __linux__
 	_nat_c_addr = inet_addr("192.168.26.26");
@@ -1083,7 +1083,7 @@ void module_init(void)
 	_nat_c_addr = inet_addr("10.2.0.1");
 #endif
 	_nat_s_addr = inet_addr("10.2.0.26");
-	_nat_s_port = htons(1080); // socks服务端端口
+	_nat_s_port = htons(port); // socks服务端端口
 
 	_nat_ssl_port = htons(8080);
 	_nat_web_port = htons(8443);

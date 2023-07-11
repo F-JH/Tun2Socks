@@ -7,6 +7,7 @@
 
 #include <unistd.h>
 #include <sys/ioctl.h>
+#include <arpa/inet.h>
 
 #include <sys/kern_control.h>
 #include <net/if_utun.h>
@@ -137,7 +138,7 @@ void vpn_tun_alloc(struct utun* utunx)
     fflush(stdout);
 }
 
-void module_init(void);
+void module_init(uint16_t port);
 ssize_t tcp_frag_nat(void *packet, size_t len, size_t limit);
 ssize_t udp_frag_nat(void *packet, size_t len, size_t limit);
 void print_packet(char* packet, int len);
@@ -208,10 +209,20 @@ static void init_route(char* buf, int len){
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2){
-        strcpy(vpn_server, "103.118.42.54");
+    uint16_t port = 1080;
+    if (argc < 3){
+        err("required socks5 server ip addr and port");
     } else{
         strcpy(vpn_server, argv[1]);
+        if (INADDR_NONE == inet_addr(vpn_server)){
+            err("socks server ip is invalid!");
+            exit(-1);
+        }
+        if ((atoi(argv[2]) & 0xffff) != atoi(argv[2]) || atoi(argv[2]) == 0){
+            err("socks server port is invaild!");
+            exit(-1);
+        }
+        port = atoi(argv[2]);
     }
     //ctrl+c信号处理
     signal(SIGINT, signal_handler);
@@ -228,7 +239,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	module_init();
+	module_init(port);
 
     snprintf(buf, sizeof(buf), "ifconfig %s 10.2.0.26/24 10.2.0.1 up", utunx.ifname);
 	system(buf);
